@@ -13,6 +13,7 @@ dependencies = [
     "moviepy>=2.1.2",
     "numpy>=2.2.5",
     "openai>=1.79.0",
+    "opencv-python>=4.11.0.86",
     "psycopg2-binary>=2.9.10",
     "scenedetect>=0.6.6",
     "semgrep>=1.122.0",

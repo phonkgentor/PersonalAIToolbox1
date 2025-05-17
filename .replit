@@ -2,7 +2,7 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["ffmpeg-full", "imagemagickBig", "openssl", "postgresql"]
+packages = ["ffmpeg-full", "imagemagickBig", "libGL", "libGLU", "openssl", "postgresql"]
 
 [deployment]
 deploymentTarget = "autoscale"
