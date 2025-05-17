@@ -261,13 +261,13 @@ def start_scene_detection():
                 "error": "Only MP4, MKV, and AVI video files are allowed"
             }), 400
         
-        # Check file size (limiting to 100MB)
+        # Check file size (limiting to 500MB)
         content_length = request.content_length
-        if content_length and content_length > 100 * 1024 * 1024:  # 100MB
+        if content_length and content_length > 500 * 1024 * 1024:  # 500MB
             logging.warning(f"File too large: {content_length} bytes")
             return jsonify({
                 "success": False,
-                "error": "File size exceeds the maximum limit of a 100MB"
+                "error": "File size exceeds the maximum limit of 500MB"
             }), 413
         
         # Get scene detection settings
