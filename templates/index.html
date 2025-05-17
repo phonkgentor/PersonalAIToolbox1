@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal AI Tools</title>
+    <title>Anime Scene Editor Pro</title>
     <!-- Replit Bootstrap Theme -->
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     <!-- Font Awesome for icons -->
@@ -15,7 +15,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-robot me-2"></i>Personal AI Tools
+                <i class="fas fa-video me-2"></i>Anime Scene Editor Pro
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -23,23 +23,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#chat" data-bs-toggle="tab" data-bs-target="#chat-tab">
-                            <i class="fas fa-comments me-1"></i> AI Chat
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#bug-scanner" data-bs-toggle="tab" data-bs-target="#bug-scanner-tab">
-                            <i class="fas fa-bug me-1"></i> Bug Scanner
+                        <a class="nav-link active" href="#anime-editor" data-bs-toggle="tab" data-bs-target="#anime-editor-tab">
+                            <i class="fas fa-scissors me-1"></i> Scene Editor
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#amv-generator" data-bs-toggle="tab" data-bs-target="#amv-generator-tab">
                             <i class="fas fa-film me-1"></i> AMV Generator
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#anime-editor" data-bs-toggle="tab" data-bs-target="#anime-editor-tab">
-                            <i class="fas fa-video me-1"></i> Anime Scene Editor
                         </a>
                     </li>
                 </ul>
@@ -57,31 +47,21 @@
 
     <div class="container mt-4">
         <div class="tab-content" id="myTabContent">
-            <!-- AI Chat Tab -->
-            <div class="tab-pane fade show active" id="chat-tab" role="tabpanel" aria-labelledby="chat-tab">
-                {% include 'chat.html' %}
-            </div>
-
-            <!-- Bug Scanner Tab -->
-            <div class="tab-pane fade" id="bug-scanner-tab" role="tabpanel" aria-labelledby="bug-scanner-tab">
-                {% include 'bug_scanner.html' %}
+            <!-- Anime Scene Editor Tab -->
+            <div class="tab-pane fade show active" id="anime-editor-tab" role="tabpanel" aria-labelledby="anime-editor-tab">
+                {% include 'anime_editor.html' %}
             </div>
 
             <!-- AMV Generator Tab -->
             <div class="tab-pane fade" id="amv-generator-tab" role="tabpanel" aria-labelledby="amv-generator-tab">
                 {% include 'amv_generator.html' %}
             </div>
-
-            <!-- Anime Scene Editor Tab -->
-            <div class="tab-pane fade" id="anime-editor-tab" role="tabpanel" aria-labelledby="anime-editor-tab">
-                {% include 'anime_editor.html' %}
-            </div>
         </div>
     </div>
 
     <footer class="footer mt-5 py-3 bg-dark">
         <div class="container text-center">
-            <span class="text-muted">Personal AI Tools &copy; 2023</span>
+            <span class="text-muted">Anime Scene Editor Pro &copy; 2025</span>
         </div>
     </footer>
 
