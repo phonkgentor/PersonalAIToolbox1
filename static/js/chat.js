@@ -7,7 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generate a session ID for this chat
     let sessionId = localStorage.getItem('chat_session_id');
     if (!sessionId) {
-        sessionId = window.generateUUID();
+        // Generate UUID locally instead of using window.generateUUID
+        sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
         localStorage.setItem('chat_session_id', sessionId);
     }
     
