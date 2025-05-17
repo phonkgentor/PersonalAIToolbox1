@@ -12,7 +12,7 @@ app.secret_key = os.environ.get("SESSION_SECRET")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configure upload sizes for video files
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max size
+app.config['MAX_CONTENT_LENGTH'] = 250 * 1024 * 1024  # 250MB max size
 app.config['MAX_CONTENT_LENGTH_CHUNK'] = 1024 * 1024  # 1MB chunks
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['RESULTS_FOLDER'] = 'results'
