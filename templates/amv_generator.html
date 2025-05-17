@@ -1,0 +1,102 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-film me-2"></i>AMV Generator</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-secondary">
+                                <h5 class="mb-0">Upload Anime Video</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="amv-form" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="video-file" class="form-label">Upload Anime Episode (MP4/MKV/AVI)</label>
+                                        <input class="form-control" type="file" id="video-file" name="video" accept=".mp4,.mkv,.avi" required>
+                                        <div class="form-text">Max file size: 500MB</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="youtube-url" class="form-label">YouTube Music URL</label>
+                                        <input type="url" class="form-control" id="youtube-url" name="music_url" placeholder="https://www.youtube.com/watch?v=..." required>
+                                        <div class="form-text">Enter a YouTube URL for the background music</div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-magic me-1"></i>Generate AMV
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div id="amv-job-progress" class="d-none">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">Processing Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p id="amv-current-step">Initializing...</p>
+                                    <div class="progress mb-3">
+                                        <div id="amv-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <div id="amv-error-message" class="alert alert-danger d-none"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-secondary">
+                                <h5 class="mb-0">Generated AMVs</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="amv-results-empty" class="text-center text-muted py-5">
+                                    <i class="fas fa-film fa-3x mb-3"></i>
+                                    <p>Submit a video and music to generate AMVs</p>
+                                </div>
+                                
+                                <div id="amv-results-content" class="d-none">
+                                    <div class="mb-4">
+                                        <h6>3-Minute AMV</h6>
+                                        <div class="d-grid">
+                                            <button id="download-3min-amv" class="btn btn-success mb-2" disabled>
+                                                <i class="fas fa-download me-1"></i>Download 3-Minute AMV
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h6>1-Minute AMV</h6>
+                                        <div class="d-grid">
+                                            <button id="download-1min-amv" class="btn btn-success" disabled>
+                                                <i class="fas fa-download me-1"></i>Download 1-Minute AMV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-1"></i>How it works:</h6>
+                    <ol>
+                        <li>Upload an anime episode (MP4, MKV, or AVI format)</li>
+                        <li>Provide a YouTube link for background music</li>
+                        <li>Our system automatically extracts 3-minute and 1-minute clips</li>
+                        <li>The music is overlaid to create your custom AMVs</li>
+                        <li>Download and enjoy your automatically generated AMVs!</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/amv_generator.js') }}"></script>

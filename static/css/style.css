@@ -1,0 +1,167 @@
+/* General styling */
+body {
+    background-color: #121212;
+    color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Tab styling */
+.nav-tabs .nav-link {
+    color: #adb5bd;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #343a40;
+    color: #fff;
+    border-color: #495057;
+}
+
+/* Card styling */
+.card {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #343a40;
+    border-bottom: 1px solid #444;
+}
+
+/* Progress bar customization */
+.progress {
+    background-color: #444;
+}
+
+/* Chat styling */
+.message-row {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.assistant-message {
+    justify-content: flex-start;
+}
+
+.system-message {
+    justify-content: center;
+}
+
+.message-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #343a40;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.user-message .message-icon {
+    background-color: #0d6efd;
+    order: 2;
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+.system-message .message-icon {
+    background-color: #dc3545;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 0.75rem;
+    border-radius: 1rem;
+    background-color: #343a40;
+}
+
+.user-message .message-bubble {
+    background-color: #0d6efd;
+    border-top-right-radius: 0;
+}
+
+.assistant-message .message-bubble {
+    background-color: #495057;
+    border-top-left-radius: 0;
+}
+
+.system-message .message-bubble {
+    background-color: #dc3545;
+}
+
+.message-content {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.message-content pre {
+    background-color: #212529;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Typing indicator */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background-color: #adb5bd;
+    border-radius: 50%;
+    display: inline-block;
+    animation: typing 1.4s infinite both;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+/* Scene card styling */
+.scene-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.scene-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.scene-card.border-primary {
+    border-width: 2px;
+}
+
+.scene-card img {
+    height: 120px;
+    object-fit: cover;
+}
