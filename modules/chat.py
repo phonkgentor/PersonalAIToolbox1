@@ -33,17 +33,21 @@ def send_message():
         chat_histories[session_id].append({"role": "user", "content": user_message})
         
         # If OpenAI API key is not set, use a mock response
-        if not OPENAI_API_KEY:
-            ai_response = "I'm sorry, the OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable."
-            logging.warning("OpenAI API key not set. Using mock response.")
-        else:
-            # Send the full conversation history to maintain context
-            response = openai_client.chat.completions.create(
-                model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-                messages=chat_histories[session_id],
-                max_tokens=500
-            )
-            ai_response = response.choices[0].message.content
+        try:
+            if not OPENAI_API_KEY:
+                ai_response = "I'm sorry, the OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable."
+                logging.warning("OpenAI API key not set. Using mock response.")
+            else:
+                # Send the full conversation history to maintain context
+                response = openai_client.chat.completions.create(
+                    model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+                    messages=chat_histories[session_id],
+                    max_tokens=500
+                )
+                ai_response = response.choices[0].message.content
+        except Exception as e:
+            logging.error(f"Error with OpenAI API: {str(e)}")
+            ai_response = "I apologize, but there's an issue with the API connection. The API key may have reached its quota limit (Error 429). For now, I can simulate responses for testing purposes. In a real scenario, you would receive AI-generated responses here."
         
         # Add AI response to history
         chat_histories[session_id].append({"role": "assistant", "content": ai_response})
