@@ -23,25 +23,29 @@ def allowed_video_file(filename):
     """Check if the file is an allowed video format"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'mp4', 'mkv', 'avi'}
 
-def detect_scenes(job_id, video_path, output_dir):
-    """Detect scenes in the video using PySceneDetect"""
+def detect_scenes(job_id, video_path, output_dir, threshold=30, min_scene_length=2):
+    """Detect scenes in the video using PySceneDetect with custom parameters"""
     try:
-        logging.info(f"Starting scene detection for job {job_id}")
+        logging.info(f"Starting scene detection for job {job_id} with threshold={threshold}, min_scene_length={min_scene_length}")
         running_jobs[job_id]["status"] = "processing"
         running_jobs[job_id]["progress"] = 10
-        running_jobs[job_id]["current_step"] = "Detecting scenes..."
+        running_jobs[job_id]["current_step"] = "Analyzing video for scene changes..."
         
         # Create temporary directory for processing
         with tempfile.TemporaryDirectory() as temp_dir:
             # Detect scenes using PySceneDetect
             scenes_json_path = os.path.join(temp_dir, "scenes.json")
             
-            # Run PySceneDetect
+            # Convert minimum scene length to number of frames (assuming 30fps)
+            min_scene_frames = min_scene_length * 30
+            
+            # Run PySceneDetect with custom threshold
             scenedetect_cmd = [
                 "scenedetect",
                 "-i", video_path,
                 "detect-content",
-                "-t", "30",  # Threshold for scene detection (adjust as needed)
+                "-t", str(threshold),  # User-specified threshold for scene detection
+                "--min-scene-len", str(min_scene_frames),  # Minimum scene length in frames
                 "list-scenes",
                 "-o", scenes_json_path,
                 "-f", "json"
@@ -254,6 +258,19 @@ def start_scene_detection():
                 "error": "Only MP4, MKV, and AVI video files are allowed"
             }), 400
         
+        # Get scene detection settings
+        threshold = request.form.get('threshold', '30')  # Default threshold is 30
+        min_scene_length = request.form.get('min_scene_length', '2')  # Default is 2 seconds
+        
+        # Validate settings
+        try:
+            threshold = int(threshold)
+            min_scene_length = int(min_scene_length)
+        except ValueError:
+            threshold = 30
+            min_scene_length = 2
+            logging.warning("Invalid detection settings, using defaults")
+        
         # Create job ID and directories
         job_id = str(uuid.uuid4())
         upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'videos')
@@ -261,16 +278,26 @@ def start_scene_detection():
         os.makedirs(upload_dir, exist_ok=True)
         os.makedirs(output_dir, exist_ok=True)
         
-        # Save uploaded video
-        filename = secure_filename(video_file.filename)
+        # Save uploaded video - Use empty string as default to avoid None
+        filename = secure_filename(video_file.filename or "")
+        if not filename:
+            return jsonify({
+                "success": False,
+                "error": "Invalid video file"
+            }), 400
+            
         video_path = os.path.join(upload_dir, f"{job_id}_{filename}")
         video_file.save(video_path)
+        
+        logging.info(f"Starting scene detection job {job_id} with threshold={threshold}, min_scene_length={min_scene_length}")
         
         # Start scene detection in a separate thread
         running_jobs[job_id] = {
             "id": job_id,
             "filename": filename,
             "video_path": video_path,
+            "threshold": threshold,
+            "min_scene_length": min_scene_length,
             "status": "starting",
             "progress": 0,
             "current_step": "Job queued",
@@ -279,9 +306,10 @@ def start_scene_detection():
             "error": None
         }
         
+        # Pass the detection settings to the worker thread
         thread = threading.Thread(
             target=detect_scenes,
-            args=(job_id, video_path, output_dir)
+            args=(job_id, video_path, output_dir, threshold, min_scene_length)
         )
         thread.daemon = True
         thread.start()
@@ -302,10 +330,13 @@ def start_scene_detection():
 @anime_editor_bp.route('/edit_video', methods=['POST'])
 def start_video_editing():
     try:
-        data = request.json
-        job_id = data.get('job_id')
+        data = request.json or {}
+        job_id = data.get('job_id', '')
         selected_scenes = data.get('selected_scenes', [])
-        music_url = data.get('music_url')
+        ordered_scenes = data.get('ordered_scenes', selected_scenes.copy() if selected_scenes else [])
+        music_url = data.get('music_url', '')
+        beat_sync = data.get('beat_sync', True)
+        fade_audio = data.get('fade_audio', False)
         
         if not job_id:
             return jsonify({

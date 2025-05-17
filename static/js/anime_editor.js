@@ -356,6 +356,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Get the audio options
+        const enableBeatSync = beatSyncCheckbox ? beatSyncCheckbox.checked : true;
+        const enableFadeAudio = fadeAudioCheckbox ? fadeAudioCheckbox.checked : false;
+        
         // Show editing progress
         editJobProgress.classList.remove('d-none');
         editErrorMessage.classList.add('d-none');
@@ -371,7 +375,10 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({
                 job_id: currentJobId,
                 selected_scenes: selectedScenes,
-                music_url: youtubeUrl
+                ordered_scenes: orderedScenes,
+                music_url: youtubeUrl,
+                beat_sync: enableBeatSync,
+                fade_audio: enableFadeAudio
             })
         })
         .then(response => response.json())
