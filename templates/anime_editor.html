@@ -1,26 +1,49 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0"><i class="fas fa-video me-2"></i>Anime Scene Editor</h4>
+        <div class="card border-0 shadow">
+            <div class="card-header bg-dark">
+                <h4 class="mb-0"><i class="fas fa-film me-2"></i>Professional Anime Scene Editor</h4>
             </div>
             <div class="card-body">
                 <div class="row">
                     <!-- Phase 1: Upload & Scene Detection -->
                     <div id="phase-1" class="col-md-12">
-                        <div class="card mb-3">
-                            <div class="card-header bg-secondary">
-                                <h5 class="mb-0">Upload Anime Video</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-dark">
+                                <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Upload Anime Video</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body bg-dark">
                                 <form id="scene-detection-form" enctype="multipart/form-data">
-                                    <div class="mb-3">
-                                        <label for="anime-video" class="form-label">Upload Anime Video (MP4/MKV/AVI)</label>
-                                        <input class="form-control" type="file" id="anime-video" name="video" accept=".mp4,.mkv,.avi" required>
-                                        <div class="form-text">Max file size: 500MB</div>
+                                    <div class="mb-4">
+                                        <label for="anime-video" class="form-label fw-bold">Upload Anime Video</label>
+                                        <input class="form-control form-control-lg" type="file" id="anime-video" name="video" accept=".mp4,.mkv,.avi" required>
+                                        <div class="form-text mt-2">Supported formats: MP4, MKV, AVI. Max file size: 500MB</div>
                                     </div>
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary">
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Scene Detection Settings</label>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="threshold" class="form-label">Detection Sensitivity</label>
+                                                <select class="form-select" id="threshold" name="threshold">
+                                                    <option value="20">High (Detects more scenes)</option>
+                                                    <option value="30" selected>Medium (Balanced)</option>
+                                                    <option value="40">Low (Detects fewer scenes)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="min-scene-length" class="form-label">Minimum Scene Length</label>
+                                                <select class="form-select" id="min-scene-length" name="min_scene_length">
+                                                    <option value="1">1 second</option>
+                                                    <option value="2" selected>2 seconds</option>
+                                                    <option value="5">5 seconds</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary btn-lg">
                                             <i class="fas fa-cut me-1"></i>Detect Scenes
                                         </button>
                                     </div>
@@ -29,13 +52,13 @@
                         </div>
                         
                         <div id="scene-job-progress" class="d-none">
-                            <div class="card">
+                            <div class="card border-0 shadow-sm">
                                 <div class="card-header bg-info text-white">
-                                    <h5 class="mb-0">Processing Status</h5>
+                                    <h5 class="mb-0"><i class="fas fa-cog fa-spin me-2"></i>Processing Video</h5>
                                 </div>
                                 <div class="card-body">
-                                    <p id="scene-current-step">Initializing...</p>
-                                    <div class="progress mb-3">
+                                    <p id="scene-current-step" class="fw-bold">Initializing...</p>
+                                    <div class="progress mb-3" style="height: 20px;">
                                         <div id="scene-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
                                     </div>
                                     <div id="scene-error-message" class="alert alert-danger d-none"></div>
@@ -46,42 +69,79 @@
                     
                     <!-- Phase 2: Scene Selection and Editing -->
                     <div id="phase-2" class="col-md-12 d-none">
-                        <div class="card mb-3">
-                            <div class="card-header bg-secondary">
-                                <h5 class="mb-0">Select Scenes</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-dark">
+                                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Arrange Your Movie</h5>
                             </div>
                             <div class="card-body">
-                                <p>Select the scenes you want to include in your edited video:</p>
-                                <div class="row" id="scenes-container">
-                                    <!-- Scenes will be populated here -->
+                                <div class="alert alert-info mb-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span>Select scenes and arrange them in the order you want. Use drag and drop to reorder scenes.</span>
                                 </div>
                                 
-                                <div class="mt-4">
-                                    <div class="mb-3">
-                                        <label for="edit-youtube-url" class="form-label">YouTube Music URL</label>
-                                        <input type="url" class="form-control" id="edit-youtube-url" placeholder="https://www.youtube.com/watch?v=..." required>
-                                        <div class="form-text">Enter a YouTube URL for the background music</div>
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Available Scenes</h6>
+                                        <div>
+                                            <button id="select-all" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-check-square me-1"></i>Select All
+                                            </button>
+                                            <button id="deselect-all" class="btn btn-sm btn-outline-secondary ms-2">
+                                                <i class="fas fa-square me-1"></i>Deselect All
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="d-flex justify-content-between">
-                                        <button id="back-to-upload" class="btn btn-secondary">
-                                            <i class="fas fa-arrow-left me-1"></i>Back
-                                        </button>
-                                        <button id="create-edited-video" class="btn btn-primary">
-                                            <i class="fas fa-magic me-1"></i>Create Edited Video
-                                        </button>
+                                    <div class="row" id="scenes-container">
+                                        <!-- Scenes will be populated here -->
                                     </div>
+                                </div>
+                                
+                                <div class="row mt-5">
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <label for="edit-youtube-url" class="form-label fw-bold">Background Music</label>
+                                            <input type="url" class="form-control" id="edit-youtube-url" placeholder="https://www.youtube.com/watch?v=..." required>
+                                            <div class="form-text">Enter a YouTube URL for the background music</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Audio Options</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="beat-sync" checked>
+                                                <label class="form-check-label" for="beat-sync">
+                                                    Enable beat synchronization
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="fade-audio">
+                                                <label class="form-check-label" for="fade-audio">
+                                                    Add audio fade in/out effects
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button id="back-to-upload" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Back to Upload
+                                    </button>
+                                    <button id="create-edited-video" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-magic me-1"></i>Create Movie
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         
                         <div id="edit-job-progress" class="d-none">
-                            <div class="card">
+                            <div class="card border-0 shadow-sm">
                                 <div class="card-header bg-info text-white">
-                                    <h5 class="mb-0">Editing Progress</h5>
+                                    <h5 class="mb-0"><i class="fas fa-film me-2"></i>Creating Your Movie</h5>
                                 </div>
                                 <div class="card-body">
-                                    <p id="edit-current-step">Initializing...</p>
-                                    <div class="progress mb-3">
+                                    <p id="edit-current-step" class="fw-bold">Initializing...</p>
+                                    <div class="progress mb-3" style="height: 20px;">
                                         <div id="edit-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
                                     </div>
                                     <div id="edit-error-message" class="alert alert-danger d-none"></div>
@@ -92,16 +152,36 @@
                     
                     <!-- Phase 3: Results -->
                     <div id="phase-3" class="col-md-12 d-none">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm">
                             <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">Edited Video Ready!</h5>
+                                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Your Movie is Ready!</h5>
                             </div>
-                            <div class="card-body text-center">
-                                <p>Your custom edited anime video is now ready for download.</p>
-                                <button id="download-edited-video" class="btn btn-lg btn-success">
-                                    <i class="fas fa-download me-1"></i>Download Edited Video
-                                </button>
-                                <div class="mt-3">
+                            <div class="card-body text-center p-5">
+                                <div class="mb-4">
+                                    <i class="fas fa-film fa-4x mb-3 text-success"></i>
+                                    <h4>Your custom edited anime movie is ready for download.</h4>
+                                    <p class="text-muted">Get your video in high quality format.</p>
+                                </div>
+                                
+                                <div class="row justify-content-center mb-4">
+                                    <div class="col-md-6">
+                                        <div class="d-grid">
+                                            <button id="download-edited-video" class="btn btn-lg btn-success mb-3">
+                                                <i class="fas fa-download me-1"></i>Download Video (MP4)
+                                            </button>
+                                            <div class="btn-group">
+                                                <button class="btn btn-outline-secondary disabled">
+                                                    <i class="fas fa-cog me-1"></i>More Options
+                                                </button>
+                                                <button class="btn btn-outline-secondary disabled">
+                                                    <i class="fas fa-share-alt me-1"></i>Share
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
                                     <button id="start-new-edit" class="btn btn-primary">
                                         <i class="fas fa-plus me-1"></i>Create Another Video
                                     </button>
@@ -111,16 +191,28 @@
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
-                <div class="alert alert-info">
-                    <h6><i class="fas fa-info-circle me-1"></i>How it works:</h6>
-                    <ol>
-                        <li>Upload an anime video to automatically detect scenes</li>
-                        <li>Select the scenes you want to keep in your edited video</li>
-                        <li>Add background music from YouTube</li>
-                        <li>Our system automatically arranges the scenes and synchronizes them with the music</li>
-                        <li>Download your custom edited anime video!</li>
-                    </ol>
+            <div class="card-footer bg-dark">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-star me-2"></i>Features</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Automatic scene detection</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Music synchronization</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Custom scene selection and ordering</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>High-quality video output</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle me-2"></i>How It Works</h6>
+                        <ol class="small">
+                            <li>Upload your anime video</li>
+                            <li>Our AI detects and extracts scenes</li>
+                            <li>Choose the scenes you want and arrange them</li>
+                            <li>Add music from YouTube</li>
+                            <li>Our algorithm synchronizes scenes with music beats</li>
+                            <li>Download your professional edited video!</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>

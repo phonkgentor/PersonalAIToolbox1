@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Phase 1: Scene Detection
     const sceneDetectionForm = document.getElementById('scene-detection-form');
     const animeVideoInput = document.getElementById('anime-video');
+    const thresholdSelect = document.getElementById('threshold');
+    const minSceneLengthSelect = document.getElementById('min-scene-length');
     const sceneJobProgress = document.getElementById('scene-job-progress');
     const sceneCurrentStep = document.getElementById('scene-current-step');
     const sceneProgressBar = document.getElementById('scene-progress-bar');
@@ -12,9 +14,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const phase2 = document.getElementById('phase-2');
     const phase3 = document.getElementById('phase-3');
     const scenesContainer = document.getElementById('scenes-container');
+    const selectAllButton = document.getElementById('select-all');
+    const deselectAllButton = document.getElementById('deselect-all');
     const backToUploadButton = document.getElementById('back-to-upload');
     const createEditedVideoButton = document.getElementById('create-edited-video');
     const editYoutubeUrlInput = document.getElementById('edit-youtube-url');
+    const beatSyncCheckbox = document.getElementById('beat-sync');
+    const fadeAudioCheckbox = document.getElementById('fade-audio');
     const editJobProgress = document.getElementById('edit-job-progress');
     const editCurrentStep = document.getElementById('edit-current-step');
     const editProgressBar = document.getElementById('edit-progress-bar');
@@ -27,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentJobId = null;
     let pollingInterval = null;
     let selectedScenes = [];
+    let orderedScenes = [];
     
     // Handle scene detection form submission
     sceneDetectionForm.addEventListener('submit', function(e) {
@@ -38,10 +45,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const videoFile = animeVideoInput.files[0];
+        const threshold = thresholdSelect.value;
+        const minSceneLength = minSceneLengthSelect.value;
         
         // Create a FormData object
         const formData = new FormData();
         formData.append('video', videoFile);
+        formData.append('threshold', threshold);
+        formData.append('min_scene_length', minSceneLength);
         
         // Show loading state
         sceneJobProgress.classList.remove('d-none');
@@ -123,15 +134,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateScenes(scenes) {
         scenesContainer.innerHTML = '';
         selectedScenes = [];
+        orderedScenes = [];
         
         if (!scenes || scenes.length === 0) {
-            scenesContainer.innerHTML = '<div class="col-12"><div class="alert alert-warning">No scenes detected. Please try with a different video.</div></div>';
+            scenesContainer.innerHTML = '<div class="col-12"><div class="alert alert-warning">No scenes detected. Please try with a different video or adjust detection settings.</div></div>';
             return;
         }
         
         scenes.forEach(scene => {
             const sceneCard = document.createElement('div');
-            sceneCard.className = 'col-md-3 mb-3';
+            sceneCard.className = 'col-md-3 mb-4';
+            sceneCard.setAttribute('draggable', true);
+            sceneCard.dataset.sceneId = scene.id;
             
             // Format duration
             const duration = window.formatTimestamp(scene.duration);
@@ -140,19 +154,24 @@ document.addEventListener('DOMContentLoaded', function() {
             
             sceneCard.innerHTML = `
                 <div class="card scene-card" data-scene-id="${scene.id}">
-                    <img src="/anime_editor/thumbnail/${currentJobId}/${scene.id}" class="card-img-top" alt="Scene thumbnail">
+                    <div class="card-header bg-dark p-2 d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary">Scene ${scene.id + 1}</span>
+                        <span class="badge bg-secondary">${duration}</span>
+                    </div>
+                    <img src="/anime_editor/thumbnail/${currentJobId}/${scene.id}" class="card-img-top scene-thumbnail" alt="Scene thumbnail">
                     <div class="card-body">
-                        <h6 class="card-title">Scene ${scene.id + 1}</h6>
-                        <p class="card-text small">
-                            Duration: ${duration}<br>
-                            Range: ${startTime} - ${endTime}
+                        <p class="card-text small mb-2">
+                            <i class="fas fa-clock me-1"></i> ${startTime} - ${endTime}
                         </p>
                         <div class="form-check">
                             <input class="form-check-input scene-checkbox" type="checkbox" value="${scene.id}" id="scene-${scene.id}">
                             <label class="form-check-label" for="scene-${scene.id}">
-                                Select this scene
+                                Include in movie
                             </label>
                         </div>
+                    </div>
+                    <div class="card-footer bg-dark p-2 text-center">
+                        <div class="scene-order badge bg-secondary d-none">1</div>
                     </div>
                 </div>
             `;
@@ -163,31 +182,155 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add event listeners to scene checkboxes
         document.querySelectorAll('.scene-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
+                const sceneId = parseInt(this.value);
+                const card = document.querySelector(`.scene-card[data-scene-id="${sceneId}"]`);
+                
                 if (this.checked) {
-                    selectedScenes.push(parseInt(this.value));
+                    selectedScenes.push(sceneId);
+                    if (!orderedScenes.includes(sceneId)) {
+                        orderedScenes.push(sceneId);
+                    }
                 } else {
-                    selectedScenes = selectedScenes.filter(id => id !== parseInt(this.value));
+                    selectedScenes = selectedScenes.filter(id => id !== sceneId);
+                    orderedScenes = orderedScenes.filter(id => id !== sceneId);
                 }
                 
                 // Update UI to show which scenes are selected
                 updateSelectedScenesUI();
             });
         });
+        
+        // Add drag and drop functionality for scene reordering
+        const sceneCards = document.querySelectorAll('[draggable=true]');
+        sceneCards.forEach(card => {
+            card.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', card.dataset.sceneId);
+                setTimeout(() => card.classList.add('dragging'), 0);
+            });
+            
+            card.addEventListener('dragend', function() {
+                card.classList.remove('dragging');
+            });
+            
+            card.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+            
+            card.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const draggedSceneId = parseInt(e.dataTransfer.getData('text/plain'));
+                const targetSceneId = parseInt(card.dataset.sceneId);
+                
+                if (draggedSceneId !== targetSceneId && 
+                    selectedScenes.includes(draggedSceneId) && 
+                    selectedScenes.includes(targetSceneId)) {
+                    reorderScenes(draggedSceneId, targetSceneId);
+                }
+            });
+        });
+        
+        // Add select/deselect all functionality
+        if (selectAllButton) {
+            selectAllButton.addEventListener('click', function() {
+                document.querySelectorAll('.scene-checkbox').forEach(checkbox => {
+                    checkbox.checked = true;
+                    const sceneId = parseInt(checkbox.value);
+                    if (!selectedScenes.includes(sceneId)) {
+                        selectedScenes.push(sceneId);
+                        if (!orderedScenes.includes(sceneId)) {
+                            orderedScenes.push(sceneId);
+                        }
+                    }
+                });
+                updateSelectedScenesUI();
+            });
+        }
+        
+        if (deselectAllButton) {
+            deselectAllButton.addEventListener('click', function() {
+                document.querySelectorAll('.scene-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                selectedScenes = [];
+                orderedScenes = [];
+                updateSelectedScenesUI();
+            });
+        }
+    }
+    
+    // Function to reorder scenes
+    function reorderScenes(draggedSceneId, targetSceneId) {
+        // Find positions in the orderedScenes array
+        const draggedIndex = orderedScenes.indexOf(draggedSceneId);
+        const targetIndex = orderedScenes.indexOf(targetSceneId);
+        
+        if (draggedIndex !== -1 && targetIndex !== -1) {
+            // Remove dragged scene from its current position
+            orderedScenes.splice(draggedIndex, 1);
+            
+            // Insert it at the target position
+            const newIndex = draggedIndex < targetIndex ? targetIndex : targetIndex;
+            orderedScenes.splice(newIndex, 0, draggedSceneId);
+            
+            // Update UI
+            updateSelectedScenesUI();
+        }
     }
     
     // Function to update the UI to show which scenes are selected
     function updateSelectedScenesUI() {
+        // First, mark all selected scenes
         document.querySelectorAll('.scene-card').forEach(card => {
             const sceneId = parseInt(card.dataset.sceneId);
+            
+            // Update selection status
             if (selectedScenes.includes(sceneId)) {
                 card.classList.add('border-primary');
+                card.classList.add('shadow');
             } else {
                 card.classList.remove('border-primary');
+                card.classList.remove('shadow');
+            }
+            
+            // Update order numbers for selected scenes
+            const orderBadge = card.querySelector('.scene-order');
+            if (selectedScenes.includes(sceneId) && orderBadge) {
+                const orderIndex = orderedScenes.indexOf(sceneId);
+                if (orderIndex !== -1) {
+                    orderBadge.textContent = orderIndex + 1;
+                    orderBadge.classList.remove('d-none');
+                    
+                    // Add color based on position
+                    orderBadge.classList.remove('bg-primary', 'bg-success', 'bg-info', 'bg-warning');
+                    if (orderIndex === 0) {
+                        orderBadge.classList.add('bg-primary'); // First
+                    } else if (orderIndex === orderedScenes.length - 1) {
+                        orderBadge.classList.add('bg-success'); // Last
+                    } else if (orderIndex < orderedScenes.length / 2) {
+                        orderBadge.classList.add('bg-info'); // First half
+                    } else {
+                        orderBadge.classList.add('bg-warning'); // Second half
+                    }
+                }
+            } else if (orderBadge) {
+                orderBadge.classList.add('d-none');
             }
         });
         
         // Enable/disable create button based on selection
         createEditedVideoButton.disabled = selectedScenes.length === 0;
+        
+        // Update status message
+        const statusMessage = document.querySelector('#scene-selection-status');
+        if (statusMessage) {
+            if (selectedScenes.length === 0) {
+                statusMessage.textContent = 'No scenes selected yet';
+                statusMessage.className = 'badge bg-secondary';
+            } else {
+                statusMessage.textContent = `${selectedScenes.length} scenes selected`;
+                statusMessage.className = 'badge bg-success';
+            }
+        }
     }
     
     // Handle back button click
