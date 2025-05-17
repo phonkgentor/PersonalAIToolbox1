@@ -36,16 +36,13 @@ def detect_scenes(job_id, video_path, output_dir, threshold=30, min_scene_length
             # Detect scenes using PySceneDetect
             scenes_json_path = os.path.join(temp_dir, "scenes.json")
             
-            # Convert minimum scene length to number of frames (assuming 30fps)
-            min_scene_frames = min_scene_length * 30
-            
             # Run PySceneDetect with custom threshold
+            # Note: PySceneDetect command syntax might be version-specific
             scenedetect_cmd = [
                 "scenedetect",
                 "-i", video_path,
                 "detect-content",
                 "-t", str(threshold),  # User-specified threshold for scene detection
-                "--min-scene-len", str(min_scene_frames),  # Minimum scene length in frames
                 "list-scenes",
                 "-o", scenes_json_path,
                 "-f", "json"
