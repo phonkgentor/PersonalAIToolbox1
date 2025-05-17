@@ -235,25 +235,40 @@ if __name__ == "__main__":
 @anime_editor_bp.route('/detect_scenes', methods=['POST'])
 def start_scene_detection():
     try:
+        # Check if request has the file part
         if 'video' not in request.files:
+            logging.warning("No video file in request")
             return jsonify({
                 "success": False,
-                "error": "No video file provided"
+                "error": "No video file was provided in the request"
             }), 400
         
         video_file = request.files['video']
         
-        if video_file.filename == '':
+        # Check if filename is empty (no file selected)
+        if not video_file or video_file.filename == '':
+            logging.warning("Empty filename")
             return jsonify({
                 "success": False,
-                "error": "No video file selected"
+                "error": "No video file was selected"
             }), 400
         
+        # Check if the file is allowed
         if not allowed_video_file(video_file.filename):
+            logging.warning(f"Invalid file type: {video_file.filename}")
             return jsonify({
                 "success": False,
                 "error": "Only MP4, MKV, and AVI video files are allowed"
             }), 400
+        
+        # Check file size (limiting to 100MB)
+        content_length = request.content_length
+        if content_length and content_length > 100 * 1024 * 1024:  # 100MB
+            logging.warning(f"File too large: {content_length} bytes")
+            return jsonify({
+                "success": False,
+                "error": "File size exceeds the maximum limit of a 100MB"
+            }), 413
         
         # Get scene detection settings
         threshold = request.form.get('threshold', '30')  # Default threshold is 30

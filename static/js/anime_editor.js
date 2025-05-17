@@ -45,6 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const videoFile = animeVideoInput.files[0];
+        // Check file size (limit to 100MB to prevent request timeout issues)
+        if (videoFile.size > 100 * 1024 * 1024) {
+            alert('File size exceeds 100MB limit. Please choose a smaller file.');
+            return;
+        }
+        
         const threshold = thresholdSelect.value;
         const minSceneLength = minSceneLengthSelect.value;
         
@@ -65,19 +71,24 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 currentJobId = data.job_id;
                 // Start polling for status updates
                 startSceneStatusPolling(currentJobId);
             } else {
-                showSceneError(data.error);
+                showSceneError(data.error || 'Unknown error occurred');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showSceneError('An error occurred while starting scene detection. Please try again.');
+            showSceneError('An error occurred while uploading the video. The file may be too large or the server is busy. Please try again with a smaller file.');
         });
     });
     
