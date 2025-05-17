@@ -45,9 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const videoFile = animeVideoInput.files[0];
-        // Check file size (limit to 100MB to prevent request timeout issues)
-        if (videoFile.size > 100 * 1024 * 1024) {
-            alert('File size exceeds 100MB limit. Please choose a smaller file.');
+        // Check file size (limit to 500MB to prevent request timeout issues)
+        if (videoFile.size > 500 * 1024 * 1024) {
+            alert('File size exceeds 500MB limit. Please choose a smaller file.');
             return;
         }
         
