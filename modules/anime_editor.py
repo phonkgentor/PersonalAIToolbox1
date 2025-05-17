@@ -48,7 +48,15 @@ def detect_scenes(job_id, video_path, output_dir, threshold=30, min_scene_length
                 "-f", "json"
             ]
             
-            subprocess.run(scenedetect_cmd, check=True, capture_output=True, text=True)
+            try:
+                result = subprocess.run(scenedetect_cmd, capture_output=True, text=True)
+                if result.returncode != 0:
+                    logging.error(f"scenedetect error output: {result.stderr}")
+                    raise Exception(f"scenedetect failed: {result.stderr}")
+                logging.info(f"scenedetect output: {result.stdout}")
+            except Exception as e:
+                logging.error(f"Failed to run scenedetect: {str(e)}")
+                raise
             
             if not os.path.exists(scenes_json_path):
                 raise Exception("Failed to detect scenes")
